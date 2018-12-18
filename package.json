@@ -1,0 +1,32 @@
+{
+  "name": "coffeekraken-redux-web-worker",
+  "version": "1.0.4",
+  "description": "Redux middleware that let you use web worker with ease to handle your expensive (or not) actions",
+  "main": "dist/index.js",
+  "scripts": {
+    "dist": "babel src --out-dir dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web",
+    "worker",
+    "redux",
+    "react",
+    "coffee",
+    "kraken",
+    "coffeekraken"
+  ],
+  "author": "Olivier Bossel <olivier.bossel@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
+    "babel-loader": "^8.0.4",
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "detect-browser": "^3.0.1"
+  }
+}
