@@ -1,4 +1,4 @@
-![Coffeekraken redux web worker](/.resources/redux-web-worker.jpg)
+![Coffeekraken redux web worker](/.resources/redux-web-worker.jpg =250x)
 
 # Coffeekraken redux-web-worker <img src=".resources/coffeekraken-logo.jpg" height="25px" />
 
