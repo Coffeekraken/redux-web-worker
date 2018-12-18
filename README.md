@@ -1,26 +1,28 @@
+![Coffeekraken redux web worker](/.resources/redux-web-worker.jpg)
+
 # Coffeekraken redux-web-worker <img src=".resources/coffeekraken-logo.jpg" height="25px" />
 
 <p>
-	<!-- <a href="https://travis-ci.org/coffeekraken/ww-axios">
-		<img src="https://img.shields.io/travis/coffeekraken/ww-axios.svg?style=flat-square" />
+	<!-- <a href="https://travis-ci.org/coffeekraken/redux-web-worker">
+		<img src="https://img.shields.io/travis/coffeekraken/redux-web-worker.svg?style=flat-square" />
 	</a> -->
-	<a href="https://www.npmjs.com/package/coffeekraken-ww-axios">
-		<img src="https://img.shields.io/npm/v/coffeekraken-ww-axios.svg?style=flat-square" />
+	<a href="https://www.npmjs.com/package/coffeekraken-redux-web-worker">
+		<img src="https://img.shields.io/npm/v/coffeekraken-redux-web-worker.svg?style=flat-square" />
 	</a>
-	<a href="https://github.com/coffeekraken/ww-axios/blob/master/LICENSE.txt">
-		<img src="https://img.shields.io/npm/l/coffeekraken-ww-axios.svg?style=flat-square" />
+	<a href="https://github.com/coffeekraken/redux-web-worker/blob/master/LICENSE.txt">
+		<img src="https://img.shields.io/npm/l/coffeekraken-redux-web-worker.svg?style=flat-square" />
 	</a>
-	<!-- <a href="https://github.com/coffeekraken/ww-axios">
-		<img src="https://img.shields.io/npm/dt/coffeekraken-ww-axios.svg?style=flat-square" />
+	<!-- <a href="https://github.com/coffeekraken/redux-web-worker">
+		<img src="https://img.shields.io/npm/dt/coffeekraken-redux-web-worker.svg?style=flat-square" />
 	</a>
-	<a href="https://github.com/coffeekraken/ww-axios">
-		<img src="https://img.shields.io/github/forks/coffeekraken/ww-axios.svg?style=social&label=Fork&style=flat-square" />
+	<a href="https://github.com/coffeekraken/redux-web-worker">
+		<img src="https://img.shields.io/github/forks/coffeekraken/redux-web-worker.svg?style=social&label=Fork&style=flat-square" />
 	</a>
-	<a href="https://github.com/coffeekraken/ww-axios">
-		<img src="https://img.shields.io/github/stars/coffeekraken/ww-axios.svg?style=social&label=Star&style=flat-square" />
+	<a href="https://github.com/coffeekraken/redux-web-worker">
+		<img src="https://img.shields.io/github/stars/coffeekraken/redux-web-worker.svg?style=social&label=Star&style=flat-square" />
 	</a> -->
-	<a href="https://twitter.com/{twitter-username}">
-		<img src="https://img.shields.io/twitter/url/http/{twitter-username}.svg?style=social&style=flat-square" />
+	<a href="https://twitter.com/coffeekrakenio">
+		<img src="https://img.shields.io/twitter/url/http/coffeekrakenio.svg?style=social&style=flat-square" />
 	</a>
 	<a href="http://coffeekraken.io">
 		<img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=flat-square&label=coffeekraken.io&colorB=f2bc2b&style=flat-square" />
@@ -33,45 +35,121 @@ Redux middleware that let you use web worker with ease to handle your expensive 
 
 1. [Install](#readme-install)
 2. [Get Started](#readme-get-started)
-3. [Available features](#readme-features)
-4. [Browsers support](#readme-browsers-support)
-5. [Contribute](#readme-contribute)
-6. [Who are Coffeekraken?](#readme-who-are-coffeekraken)
-7. [Licence](#readme-license)
+3. [Requirements](#readme-requirements)
+4. [A note about nodejs](#readme-nodejs)
+5. [Browsers support](#readme-browsers-support)
+6. [Contribute](#readme-contribute)
+7. [Who are Coffeekraken?](#readme-who-are-coffeekraken)
+8. [Licence](#readme-license)
 
-<a name="readme-install"></a>
+<a id="readme-install"></a>
 ## Install
 
 ```
-npm install coffeekraken-ww-axios --save
+npm install coffeekraken-redux-web-worker --save
 ```
 
-<a name="readme-get-started"></a>
+<a id="readme-get-started"></a>
 ## Get Started
 
+Suppose we have container that trigger a `FETCH_TODOS` action like so:
+
+#### `TodoContainer.js`
 ```js
-import axios from 'coffeekraken-ww-axios'
-axios.get('...', {
-	// options
-}).then((response) => {
-	// do something with the response
-})
+import { registerWorker } from 'coffeekraken-redux-web-worker'
+import tasksWorker from './tasks.worker'
+import { FETCH_TODOS } from './constants'
+class TodoContainer extends React.Component {
+  componentDidMount() {
+    registerWorker(tasksWorker)
+    const { dispatch } = this.props
+    dispatch({
+      type: FETCH_TODOS,
+      payload: 'something'
+    })
+  }
+}
 ```
 
-<a id="readme-features"></a>
-## Available features
+> Note that we have imported and registered the worker before dispatching the action.
 
-1. All the query methods like `request, get, delete, head, options, post, put, patch`
-2. The `axios.create` method. It will return a promise filled with the actual axios instance
-3. All the `axios.create` query methods like `request, get, delete, head, options, post, put, patch`
-4. Setting some default configuration through the `axios.defaults...`
+Now that we have an action dispatched and our worker registered, let's see the `tasks.worker.js` content:
 
-#### Unavailable features
+#### `tasks.worker.js`
 
-1. All the callbacks like `paramsSerializer`, `adapter`, `onUploadProgress`, `onDownloadProgress`, etc...
-2. interceptors
-3. Cancellation
-4. application/x-www-form-urlencoded format
+```js
+import axios from 'axios'
+import { WebWorker } from 'coffeekraken-redux-web-worker'
+import { FETCH_TODOS, TODOS_FETCHED } from './constants'
+
+class TodoTasks extends WebWorker {
+  // take care of the FETCH_TODOS action	
+  async [FETCH_TODOS]({ action, dispatch }) {
+    const todos = await axios.get(
+      'https://my-json-server.typicode.com/coffeekraken/react-boilerplate/todos'
+    )
+    dispatch({
+      type: TODOS_FETCHED,
+      todos: todos.data
+    })
+  }
+}
+new TodoTasks(self)
+```
+
+The last step if to apply the middleware as you would do for any other redux middleware. Here's how:
+
+#### `store.js`
+
+```js
+import { createStore, applyMiddleware } from 'redux'
+import webworkerMiddleware from 'coffeekraken-redux-web-worker'
+
+import reducer from './reducers'
+
+// create the store with our middleware
+const store = createStore(
+  reducer,
+  applyMiddleware(webworkerMiddleware)
+)
+
+// render the application
+```
+
+<a id="readme-requirements"></a>
+## Requirements
+
+In order for this middleware to work, you'll need to install the [worker-loader](https://github.com/webpack-contrib/worker-loader) webpack loader.
+
+```
+npm install worker-loader --save-dev
+```
+
+Here's an example of webpack configuration:
+
+#### `webpack.config.js`
+```js
+module.exports = {
+  //...
+  module: {
+    rules: [{
+      test: /\.worker\.js$/,
+      use: {
+        loader: 'worker-loader',
+        options: {
+          inline: true,
+          fallback: false
+        }
+      }
+    }]
+  }
+}
+```
+
+<a id="readme-nodejs"></a>
+## A note about nodejs
+
+Unfortunately, this middleware can't fully work in a nodejs environement. This said, it doesn't mean that you cannot use it for SSR (server side rendering). When you run your code in a nodejs environment, the workers will just not being registered and when your code runs in the browser side, the code will run again and the execution of your workers will start as normal.
 
 <a id="readme-browsers-support"></a>
 ## Browsers support
