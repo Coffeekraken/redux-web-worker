@@ -79,12 +79,11 @@ Now that we have an action dispatched and our worker registered, let's see the `
 
 ```js
 import axios from 'axios'
-import { WebWorker } from 'coffeekraken-redux-web-worker'
+import { expose } from '../../middlewares/webworker'
 import { FETCH_TODOS, TODOS_FETCHED } from './constants'
 
-class TodoTasks extends WebWorker {
-  // take care of the FETCH_TODOS action	
-  async [FETCH_TODOS]({ action, dispatch }) {
+export default expose({
+  [FETCH_TODOS]: async ({ dispatch }) => {
     const todos = await axios.get(
       'https://my-json-server.typicode.com/coffeekraken/react-boilerplate/todos'
     )
@@ -93,8 +92,7 @@ class TodoTasks extends WebWorker {
       todos: todos.data
     })
   }
-}
-new TodoTasks(self)
+}, self)
 ```
 
 The last step if to apply the middleware as you would do for any other redux middleware. Here's how:
