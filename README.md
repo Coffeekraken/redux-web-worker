@@ -36,11 +36,10 @@ Redux middleware that let you use web worker with ease to handle your expensive 
 1. [Install](#readme-install)
 2. [Get Started](#readme-get-started)
 3. [Requirements](#readme-requirements)
-4. [A note about nodejs](#readme-nodejs)
-5. [Browsers support](#readme-browsers-support)
-6. [Contribute](#readme-contribute)
-7. [Who are Coffeekraken?](#readme-who-are-coffeekraken)
-8. [Licence](#readme-license)
+4. [Browsers support](#readme-browsers-support)
+5. [Contribute](#readme-contribute)
+6. [Who are Coffeekraken?](#readme-who-are-coffeekraken)
+7. [Licence](#readme-license)
 
 <a id="readme-install"></a>
 ## Install
@@ -143,11 +142,6 @@ module.exports = {
   }
 }
 ```
-
-<a id="readme-nodejs"></a>
-## A note about nodejs
-
-Unfortunately, this middleware can't fully work in a nodejs environement. This said, it doesn't mean that you cannot use it for SSR (server side rendering). When you run your code in a nodejs environment, the workers will just not being registered and when your code runs in the browser side, the code will run again and the execution of your workers will start as normal.
 
 <a id="readme-browsers-support"></a>
 ## Browsers support
