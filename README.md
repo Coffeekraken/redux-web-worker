@@ -82,7 +82,7 @@ import { expose } from '../../middlewares/webworker'
 import { FETCH_TODOS, TODOS_FETCHED } from './constants'
 
 export default expose({
-  [FETCH_TODOS]: async ({ dispatch }) => {
+  [FETCH_TODOS]: async ({ dispatch, action, state }) => {
     const todos = await axios.get(
       'https://my-json-server.typicode.com/coffeekraken/react-boilerplate/todos'
     )

@@ -63,10 +63,15 @@ function expose(tasks, self) {
 
 
     self.addEventListener('message', function (e) {
-      // call the method that has the name of the action type
+      // extract the state from the action
+      var action = e.data;
+      var state = action._state;
+      delete action._state; // call the method that has the name of the action type
+
       if (tasks[e.data.type]) {
         tasks[e.data.type]({
-          action: e.data,
+          action: action,
+          state: state,
           dispatch: tasks._dispatch.bind(tasks)
         });
       }
@@ -79,6 +84,7 @@ function expose(tasks, self) {
       postMessage: function postMessage(data) {
         if (!tasks[data.type]) return;
         tasks[data.type]({
+          state: storeRef.getState(),
           action: data,
           dispatch: function dispatch(action) {
             storeRef.dispatch(action);
@@ -100,8 +106,10 @@ var webworkerMiddleware = function webworkerMiddleware(store) {
 
   return function (next) {
     return function (action) {
-      // on each action dispatched in the redux system,
+      // pass the state with the action
+      action._state = store.getState(); // on each action dispatched in the redux system,
       // pass it to each registered worker(s)
+
       workers.forEach(function (worker) {
         worker.postMessage(action);
       });
