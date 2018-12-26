@@ -54,10 +54,15 @@ export function expose(tasks, self) {
 
     // listen for messages from the app
     self.addEventListener('message', e => {
+      // extract the state from the action
+      const action = e.data
+      const state = action._state
+      delete action._state
       // call the method that has the name of the action type
       if (tasks[e.data.type]) {
         tasks[e.data.type]({
-          action: e.data,
+          action,
+          state,
           dispatch: tasks._dispatch.bind(tasks)
         })
       }
@@ -69,6 +74,7 @@ export function expose(tasks, self) {
     postMessage(data) {
       if (!tasks[data.type]) return
       tasks[data.type]({
+        state: storeRef.getState(),
         action: data,
         dispatch: (action) => {
           storeRef.dispatch(action)
@@ -88,6 +94,9 @@ const webworkerMiddleware = store => {
 
   // return the rest of the curried functions
   return next => action => {
+    // pass the state with the action
+    action._state = store.getState()
+
     // on each action dispatched in the redux system,
     // pass it to each registered worker(s)
     workers.forEach(worker => {

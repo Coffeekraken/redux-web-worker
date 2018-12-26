@@ -1,6 +1,6 @@
 {
   "name": "coffeekraken-redux-web-worker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Redux middleware that let you use web worker with ease to handle your expensive (or not) actions",
   "main": "dist/index.js",
   "scripts": {
