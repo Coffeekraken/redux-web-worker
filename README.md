@@ -29,7 +29,7 @@
 	</a>
 </p>
 
-Redux middleware that let you use web worker with ease to handle your expensive (or not) actions
+<p class="lead">Redux middleware that let you use web worker with ease to handle your expensive (or not) actions</p>
 
 ## Table of content
 
